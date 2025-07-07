@@ -1,0 +1,115 @@
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+.page-content {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 1rem;
+}
+
+.card {
+  background-color: #1e1e1e;
+  color: #ffffff;
+  border-radius: 16px;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.6);
+  padding: 2rem;
+  max-width: 400px;
+  width: 100%;
+  transition: box-shadow 0.3s ease;
+}
+
+.card:hover {
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.7);
+}
+
+.title {
+  font-size: 1.75rem;
+  font-weight: bold;
+  text-align: center;
+  margin-bottom: 1.5rem;
+  color: #ff6600;
+}
+
+.input {
+  width: 100%;
+  padding: 0.75rem 1rem;
+  margin-bottom: 1rem;
+  background-color: #121212;
+  border: 1px solid #333;
+  border-radius: 8px;
+  font-size: 1rem;
+  color: #f9fafb;
+  transition: border-color 0.3s ease;
+}
+
+.input:focus {
+  outline: none;
+  border-color: #ff6600;
+}
+
+.btn {
+  width: 100%;
+  padding: 0.75rem 1rem;
+  font-size: 1rem;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  margin-bottom: 1rem;
+  transition: background-color 0.3s ease;
+}
+
+.primary-btn {
+  background-color: #ff6600;
+  color: white;
+}
+
+.primary-btn:hover {
+  background-color: #cc5200;
+}
+
+.google-btn {
+  background-color: white;
+  color: #1e1e1e;
+}
+
+.google-btn:hover {
+  background-color: #e2e2e2;
+}
+
+.error {
+  color: #f87171;
+  text-align: center;
+  margin-bottom: 1rem;
+}
+
+.success {
+  color: #4ade80;
+  text-align: center;
+  margin-bottom: 1rem;
+}
+
+.toggle-text {
+  text-align: center;
+  font-size: 0.9rem;
+  color: #ff6600;
+  cursor: pointer;
+  margin-top: 0.5rem;
+}
+
+.toggle-text:hover {
+  text-decoration: underline;
+}
+
+@media (max-width: 480px) {
+  .card {
+    padding: 1.5rem;
+  }
+
+  .title {
+    font-size: 1.5rem;
+  }
+}

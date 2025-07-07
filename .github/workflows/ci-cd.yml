@@ -1,0 +1,98 @@
+name: CI/CD Pipeline
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main, develop]
+
+jobs:
+  test:
+    name: Test
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: "20.x"
+          cache: "npm"
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Create .env file
+        run: |
+          echo "VITE_FIREBASE_API_KEY=${{ secrets.VITE_FIREBASE_API_KEY }}" >> .env
+          echo "VITE_FIREBASE_AUTH_DOMAIN=${{ secrets.VITE_FIREBASE_AUTH_DOMAIN }}" >> .env
+          echo "VITE_FIREBASE_PROJECT_ID=${{ secrets.VITE_FIREBASE_PROJECT_ID }}" >> .env
+          echo "VITE_FIREBASE_STORAGE_BUCKET=${{ secrets.VITE_FIREBASE_STORAGE_BUCKET }}" >> .env
+          echo "VITE_FIREBASE_MESSAGING_SENDER_ID=${{ secrets.VITE_FIREBASE_MESSAGING_SENDER_ID }}" >> .env
+          echo "VITE_FIREBASE_APP_ID=${{ secrets.VITE_FIREBASE_APP_ID }}" >> .env
+          echo "VITE_GOOGLE_MAPS_API_KEY=${{ secrets.VITE_GOOGLE_MAPS_API_KEY }}" >> .env
+
+      - name: Lint
+        run: npm run lint
+
+      - name: Run tests with coverage
+        run: |
+          # Run tests with coverage and output to a file
+          npx jest --coverage --coverageReporters=json-summary --json > coverage.json
+
+          # Extract coverage data from the summary
+          COVERAGE_THRESHOLD=70
+
+          # Check if coverage file exists
+          if [ ! -f "coverage/coverage-summary.json" ]; then
+            echo "::error::Coverage file not found. Check if tests ran correctly."
+            exit 1
+          fi
+
+          # Extract coverage percentages
+          COVERAGE_DATA=$(cat coverage/coverage-summary.json | jq '.total')
+          LINES_COVERAGE=$(echo $COVERAGE_DATA | jq -r '.lines.pct')
+          STATEMENTS_COVERAGE=$(echo $COVERAGE_DATA | jq -r '.statements.pct')
+          FUNCTIONS_COVERAGE=$(echo $COVERAGE_DATA | jq -r '.functions.pct')
+          BRANCHES_COVERAGE=$(echo $COVERAGE_DATA | jq -r '.branches.pct')
+
+          # Set default values to 0 if null
+          LINES_COVERAGE=${LINES_COVERAGE:-0}
+          STATEMENTS_COVERAGE=${STATEMENTS_COVERAGE:-0}
+          FUNCTIONS_COVERAGE=${FUNCTIONS_COVERAGE:-0}
+          BRANCHES_COVERAGE=${BRANCHES_COVERAGE:-0}
+
+          FAILED=0
+
+          check_coverage() {
+            local metric=$1
+            local value=$2
+            
+            if (( $(echo "$value < $COVERAGE_THRESHOLD" | bc -l) )); then
+              echo "::warning::${metric} coverage is ${value}% (below threshold of ${COVERAGE_THRESHOLD}%)"
+              FAILED=1
+            else
+              echo "✅ ${metric} coverage: ${value}% (threshold: ${COVERAGE_THRESHOLD}%)"
+            fi
+          }
+
+          echo "Coverage Report:"
+          check_coverage "Lines" "$LINES_COVERAGE"
+          check_coverage "Statements" "$STATEMENTS_COVERAGE"
+          check_coverage "Functions" "$FUNCTIONS_COVERAGE"
+          check_coverage "Branches" "$BRANCHES_COVERAGE"
+
+          if [ $FAILED -eq 1 ]; then
+            echo "::error::Some coverage metrics are below the ${COVERAGE_THRESHOLD}% threshold"
+            exit 1
+          fi
+
+      - name: Install Playwright browsers
+        run: npx playwright install --with-deps
+
+      - name: Run end-to-end tests
+        run: npx playwright test --workers=1
+
+      - name: Build
+        run: npm run build

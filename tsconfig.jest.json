@@ -1,0 +1,15 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "jsx": "react-jsx",
+    "module": "es2022",
+    "moduleResolution": "node",
+    "esModuleInterop": true,
+    "allowJs": true,
+    "isolatedModules": false,
+    "noEmit": true,
+    "types": ["jest", "@testing-library/jest-dom", "node", "react", "react-dom"]
+  },
+  "include": ["src", "**/*.test.tsx", "**/*.test.ts"],
+  "exclude": ["tests/**/*"]
+} 

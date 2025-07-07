@@ -1,0 +1,1 @@
+export { RestaurantCardSkeleton } from './RestaurantCardSkeleton';
