@@ -153,10 +153,6 @@ For development with hot-reloading:
 - [Google Maps Platform](https://developers.google.com/maps)
 - [Redux Toolkit](https://redux-toolkit.js.org/)
 
-  ```
-
-  ```
-
 3. Set up environment variables:
 
    - Copy the example environment file:
